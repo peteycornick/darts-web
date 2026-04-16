@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#121212">
-    <title>Electric Chalk</title>
+    <title>Electro-Chalk</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -22,7 +22,6 @@
         .code-input { background: #222; border: 2px solid #333; color: white; padding: 12px; font-size: 20px; text-align: center; border-radius: 12px; width: 180px; }
         #lobby-qr { background: white; padding: 10px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         
-        /* NEW PEROCO NETWORKS LINK */
         .peroco-link { margin-top: 20px; color: #888; text-decoration: none; font-size: 14px; font-weight: bold; padding: 10px; transition: color 0.2s; }
         .peroco-link:active, .peroco-link:hover { color: white; }
 
@@ -72,7 +71,7 @@
 <body>
 
     <div id="lobby">
-        <div class="logo">ELECTRIC<br><span style="color:var(--green)">CHALK</span></div>
+        <div class="logo">ELECTRO-<br><span style="color:var(--green)">CHALK</span></div>
         <div id="lobby-qr"></div>
         <button class="btn btn-green" onclick="createGame()">Start New Game</button>
         <input type="number" id="join-code" class="code-input" placeholder="ID Code">
@@ -162,6 +161,10 @@
     </div>
 
     <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js');
+        }
+
         const socket = io();
         let gameId = null;
         let isHost = false;

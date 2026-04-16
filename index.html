@@ -21,6 +21,10 @@
         .btn-outline { background: transparent; color: white; border: 2px solid #333; }
         .code-input { background: #222; border: 2px solid #333; color: white; padding: 12px; font-size: 20px; text-align: center; border-radius: 12px; width: 180px; }
         #lobby-qr { background: white; padding: 10px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        
+        /* NEW PEROCO NETWORKS LINK */
+        .peroco-link { margin-top: 20px; color: #888; text-decoration: none; font-size: 14px; font-weight: bold; padding: 10px; transition: color 0.2s; }
+        .peroco-link:active, .peroco-link:hover { color: white; }
 
         #game-view { display: flex; flex-direction: column; height: 100%; padding: 5px; padding-bottom: env(safe-area-inset-bottom); }
         .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 5px; height: 35px; }
@@ -74,6 +78,8 @@
         <input type="number" id="join-code" class="code-input" placeholder="ID Code">
         <button class="btn btn-outline" onclick="joinGame()">Join Game</button>
         <p id="error-msg" style="color:var(--red)"></p>
+        
+        <a href="https://peroco.net" class="peroco-link">← Return to Peroco Networks</a>
     </div>
 
     <div id="game-view" class="hidden">

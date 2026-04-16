@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#121212">
+    <title>Electric Chalk</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        :root { --green: #00E676; --red: #FF1744; --dark: #121212; --card: #1E1E1E; --text: #ffffff; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--dark); color: var(--text); font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; user-select: none; }
+        .hidden { display: none !important; }
+
+        #lobby { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; }
+        .logo { font-size: 35px; font-weight: 900; text-align: center; margin-bottom: 10px; line-height: 1; }
+        .btn { padding: 15px; font-size: 18px; font-weight: bold; border-radius: 12px; border: none; cursor: pointer; width: 250px; text-transform: uppercase; }
+        .btn-green { background: var(--green); color: black; }
+        .btn-outline { background: transparent; color: white; border: 2px solid #333; }
+        .code-input { background: #222; border: 2px solid #333; color: white; padding: 12px; font-size: 20px; text-align: center; border-radius: 12px; width: 180px; }
+        #lobby-qr { background: white; padding: 10px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+
+        #game-view { display: flex; flex-direction: column; height: 100%; padding: 5px; padding-bottom: env(safe-area-inset-bottom); }
+        .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 5px; height: 35px; }
+        .back-btn { background: #333; color: #ccc; border: none; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; }
+        .info-group { display: flex; gap: 10px; font-size: 11px; color: #666; font-family: monospace; }
+        
+        .dual-arena { display: flex; gap: 4px; flex: 1; min-height: 0; }
+        .player-col { flex: 1; display: flex; flex-direction: column; background: var(--card); border-radius: 12px; overflow: hidden; border: 2px solid transparent; }
+        .player-col.home { border-color: rgba(0,230,118,0.2); }
+        .player-col.away { border-color: rgba(255,23,68,0.2); }
+
+        .p-header { padding: 8px 5px 0; display: flex; flex-direction: column; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); padding-bottom: 8px; }
+        .p-name { font-size: 24px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .leg-box { display: flex; align-items: center; justify-content: center; gap: 15px; background: rgba(255,255,255,0.05); border-radius: 50px; padding: 4px 10px; border: 1px solid #444; }
+        .leg-val { font-size: 22px; font-weight: 900; min-width: 30px; text-align: center; font-variant-numeric: tabular-nums; color: white; }
+        .leg-btn { width: 35px; height: 35px; border-radius: 50%; border: none; font-size: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        .home .leg-btn { background: #00E676; color: black; }
+        .away .leg-btn { background: #FF1744; color: black; }
+        .leg-btn:active { transform: scale(0.9); opacity: 0.8; }
+
+        .p-score { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 18vw; font-weight: 900; line-height: 1; position: relative; }
+        .text-green { color: var(--green); }
+        .text-red { color: var(--red); }
+        .setup-mode { color: #555; font-size: 12vw; }
+        .win-indicator { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+        .undo-btn { background: #FF9100; color: white; border: none; padding: 15px 30px; font-size: 20px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+
+        .p-hist { display: flex; gap: 2px; height: 30px; justify-content: center; padding: 0 5px; margin-bottom: 5px; }
+        .dot { flex: 1; background: #333; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #888; font-weight: bold; border: 1px solid transparent; }
+        .dot.sel { border-color: orange; color: orange; background: #332200; }
+        .p-input { height: 30px; text-align: center; font-size: 24px; font-weight: bold; font-family: monospace; color: white; background: rgba(0,0,0,0.2); margin-bottom: 5px; }
+
+        .kp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; padding: 5px; background: rgba(0,0,0,0.3); height: 45%; }
+        .k-btn { border: none; border-radius: 6px; font-size: 18px; font-weight: 700; background: #2C2C2C; color: white; padding: 0; display: flex; align-items: center; justify-content: center; }
+        .k-btn:active { background: #555; }
+        .k-act { background: #FF9100; color: black; }
+        .k-nav { background: #444; color: white; font-size: 14px; }
+        .k-clr { background: #444; color: #ff6b6b; }
+
+        #qr-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .close-qr { margin-top: 20px; padding: 10px 20px; background: #333; color: white; border: none; border-radius: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="lobby">
+        <div class="logo">ELECTRIC<br><span style="color:var(--green)">CHALK</span></div>
+        <div id="lobby-qr"></div>
+        <button class="btn btn-green" onclick="createGame()">Start New Game</button>
+        <input type="number" id="join-code" class="code-input" placeholder="ID Code">
+        <button class="btn btn-outline" onclick="joinGame()">Join Game</button>
+        <p id="error-msg" style="color:var(--red)"></p>
+    </div>
+
+    <div id="game-view" class="hidden">
+        <div class="top-bar">
+            <button class="back-btn" onclick="exitGame()">← EXIT</button>
+            <div class="info-group">
+                <span id="game-id-disp" onclick="showQR()">ID: 000000</span>
+                <span id="role-disp">GUEST</span>
+            </div>
+        </div>
+
+        <div class="dual-arena">
+            <div class="player-col home">
+                <div class="p-header">
+                    <div class="p-name text-green" id="name-home" onclick="editName('home')">Home</div>
+                    <div class="leg-box">
+                        <button class="leg-btn" onmousedown="rfStart(event, 'home', -1)" ontouchstart="rfStart(event, 'home', -1)" onmouseup="rfEnd()" onmouseleave="rfEnd()" ontouchend="rfEnd()">-</button>
+                        <div class="leg-val" id="legs-home">0</div>
+                        <button class="leg-btn" onmousedown="rfStart(event, 'home', 1)" ontouchstart="rfStart(event, 'home', 1)" onmouseup="rfEnd()" onmouseleave="rfEnd()" ontouchend="rfEnd()">+</button>
+                    </div>
+                </div>
+                <div class="p-score text-green" id="score-home">501</div>
+                <div class="p-hist" id="hist-home"></div>
+                <div class="p-input" id="in-home"></div>
+                <div class="kp-grid" id="kp-home">
+                    <button class="k-btn k-clr" onclick="kp('home','C')">C</button>
+                    <button class="k-btn k-nav" onclick="nav('home',1)">↓</button>
+                    <button class="k-btn k-nav" onclick="nav('home',-1)">↑</button>
+                    <button class="k-btn" onclick="kp('home',1)">1</button>
+                    <button class="k-btn" onclick="kp('home',2)">2</button>
+                    <button class="k-btn" onclick="kp('home',3)">3</button>
+                    <button class="k-btn" onclick="kp('home',4)">4</button>
+                    <button class="k-btn" onclick="kp('home',5)">5</button>
+                    <button class="k-btn" onclick="kp('home',6)">6</button>
+                    <button class="k-btn" onclick="kp('home',7)">7</button>
+                    <button class="k-btn" onclick="kp('home',8)">8</button>
+                    <button class="k-btn" onclick="kp('home',9)">9</button>
+                    <button class="k-btn k-act" onclick="sub('home','plus')">+</button>
+                    <button class="k-btn" onclick="kp('home',0)">0</button>
+                    <button class="k-btn k-act" onclick="sub('home','minus')">-</button>
+                </div>
+            </div>
+
+            <div class="player-col away">
+                <div class="p-header">
+                    <div class="p-name text-red" id="name-away" onclick="editName('away')">Away</div>
+                    <div class="leg-box">
+                        <button class="leg-btn" onmousedown="rfStart(event, 'away', -1)" ontouchstart="rfStart(event, 'away', -1)" onmouseup="rfEnd()" onmouseleave="rfEnd()" ontouchend="rfEnd()">-</button>
+                        <div class="leg-val" id="legs-away">0</div>
+                        <button class="leg-btn" onmousedown="rfStart(event, 'away', 1)" ontouchstart="rfStart(event, 'away', 1)" onmouseup="rfEnd()" onmouseleave="rfEnd()" ontouchend="rfEnd()">+</button>
+                    </div>
+                </div>
+                <div class="p-score text-red" id="score-away">501</div>
+                <div class="p-hist" id="hist-away"></div>
+                <div class="p-input" id="in-away"></div>
+                <div class="kp-grid" id="kp-away">
+                    <button class="k-btn k-clr" onclick="kp('away','C')">C</button>
+                    <button class="k-btn k-nav" onclick="nav('away',1)">↓</button>
+                    <button class="k-btn k-nav" onclick="nav('away',-1)">↑</button>
+                    <button class="k-btn" onclick="kp('away',1)">1</button>
+                    <button class="k-btn" onclick="kp('away',2)">2</button>
+                    <button class="k-btn" onclick="kp('away',3)">3</button>
+                    <button class="k-btn" onclick="kp('away',4)">4</button>
+                    <button class="k-btn" onclick="kp('away',5)">5</button>
+                    <button class="k-btn" onclick="kp('away',6)">6</button>
+                    <button class="k-btn" onclick="kp('away',7)">7</button>
+                    <button class="k-btn" onclick="kp('away',8)">8</button>
+                    <button class="k-btn" onclick="kp('away',9)">9</button>
+                    <button class="k-btn k-act" onclick="sub('away','plus')">+</button>
+                    <button class="k-btn" onclick="kp('away',0)">0</button>
+                    <button class="k-btn k-act" onclick="sub('away','minus')">-</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="qr-overlay" class="hidden">
+        <div style="background:white; padding:15px; border-radius:15px;" id="qr-target"></div>
+        <button class="close-qr" onclick="document.getElementById('qr-overlay').classList.add('hidden')">Close</button>
+    </div>
+
+    <script>
+        const socket = io();
+        let gameId = null;
+        let isHost = false;
+        let inputs = { home: "", away: "" };
+        let selIdx = { home: -1, away: -1 };
+        let gameState = {};
+        let rfTimer = null, rfInterval = null;
+
+        window.onload = function() {
+            new QRCode(document.getElementById("lobby-qr"), { text: window.location.href, width: 150, height: 150 });
+        }
+
+        function createGame() { socket.emit('create'); }
+        function joinGame() { 
+            let id = document.getElementById('join-code').value;
+            if(id) socket.emit('join', id); 
+        }
+
+        socket.on('gameJoined', (data) => {
+            gameId = data.gameId;
+            isHost = data.isHost;
+            document.getElementById('lobby').classList.add('hidden');
+            document.getElementById('game-view').classList.remove('hidden');
+            document.getElementById('game-id-disp').innerText = `ID: ${gameId}`;
+            document.getElementById('role-disp').innerText = isHost ? "HOST" : "GUEST";
+            if(!isHost) {
+                document.getElementById('kp-home').classList.add('hidden');
+                document.getElementById('kp-away').classList.add('hidden');
+            }
+            update(data.state);
+        });
+
+        socket.on('errorMsg', msg => document.getElementById('error-msg').innerText = msg);
+        
+        socket.on('sync', (state) => {
+            if(gameId) update(state);
+        });
+
+        function exitGame() {
+            gameId = null;
+            document.getElementById('game-view').classList.add('hidden');
+            document.getElementById('lobby').classList.remove('hidden');
+            inputs = { home: "", away: "" };
+            document.getElementById('join-code').value = "";
+        }
+
+        function update(state) {
+            gameState = state;
+            setScore('home', state);
+            setScore('away', state);
+            document.getElementById('legs-home').innerText = state.homeLegs;
+            document.getElementById('legs-away').innerText = state.awayLegs;
+            document.getElementById('name-home').innerText = state.homeName;
+            document.getElementById('name-away').innerText = state.awayName;
+            renderHist('home', state.homeHistory);
+            renderHist('away', state.awayHistory);
+            document.getElementById('in-home').innerText = inputs.home;
+            document.getElementById('in-away').innerText = inputs.away;
+        }
+
+        function setScore(team, state) {
+            let el = document.getElementById(`score-${team}`);
+            if (state[team+'CanUndo'] && isHost) {
+                if (el.querySelector('.undo-btn')) return;
+                el.innerHTML = "";
+                let btn = document.createElement("button");
+                btn.className = "undo-btn";
+                btn.innerText = "UNDO";
+                btn.onclick = () => sendAction(team, 'undo');
+                el.appendChild(btn);
+                el.classList.remove('setup-mode', 'win-indicator');
+                return;
+            }
+            if (state[team+'Setup']) {
+                if (el.innerText !== "SET") {
+                    el.innerHTML = "SET";
+                    el.classList.add('setup-mode');
+                    el.classList.remove('win-indicator');
+                }
+                return;
+            }
+            if (state[team+'Score'] == 0) {
+                 el.innerHTML = "0";
+                 el.classList.add('win-indicator');
+                 return;
+            }
+            if (el.innerText !== String(state[team+'Score'])) {
+                el.innerHTML = state[team+'Score'];
+                el.classList.remove('setup-mode', 'win-indicator');
+            }
+        }
+
+        function renderHist(team, hist) {
+            let container = document.getElementById(`hist-${team}`);
+            container.innerHTML = '';
+            for(let i=0; i<3; i++) {
+                let val = hist[i] !== undefined ? Math.abs(hist[i]) : '-';
+                let div = document.createElement('div');
+                div.className = 'dot';
+                if (val !== '-') div.classList.add('sel');
+                if (isHost && i === selIdx[team]) div.style.backgroundColor = "orange";
+                div.innerText = val;
+                container.appendChild(div);
+            }
+        }
+
+        function sendAction(team, type, value = null, index = -1) {
+            socket.emit('action', { id: gameId, team, type, value, index });
+        }
+
+        function kp(team, key) {
+            if (key === 'C') {
+                if (inputs[team] === "") sendAction(team, 'reset');
+                else { inputs[team] = ""; selIdx[team] = -1; update(gameState); }
+            } else {
+                if (inputs[team].length < 4) inputs[team] += key;
+                update(gameState);
+            }
+        }
+
+        function nav(team, dir) {
+            let max = Math.min((gameState[team+'History'].length || 0) - 1, 2);
+            if (dir === 1) { if (selIdx[team] < max) selIdx[team]++; }
+            else { if (selIdx[team] > -1) selIdx[team]--; }
+            update(gameState);
+        }
+
+        function sub(team, mode) {
+            let val = parseInt(inputs[team] || 0);
+            let finalVal = (mode === 'minus') ? -val : val;
+            let type = (selIdx[team] === -1) ? 'throw' : 'edit';
+            
+            if (gameState[team+'Score'] == 0 && mode === 'minus' && inputs[team] === "") type = 'nextLeg';
+            else if (gameState[team+'Setup'] && mode === 'minus' && inputs[team] === "") type = 'resetDefault';
+            else if (!inputs[team]) return; 
+
+            sendAction(team, type, finalVal, selIdx[team]);
+            inputs[team] = "";
+            selIdx[team] = -1;
+        }
+
+        function editName(team) {
+            if(!isHost) return;
+            let newName = prompt("Name:", document.getElementById(`name-${team}`).innerText);
+            if(newName) sendAction(team, 'name', newName);
+        }
+
+        function rfStart(e, team, val) {
+            if(!isHost) return;
+            if(e.cancelable) e.preventDefault();
+            sendAction(team, 'legUpdate', val);
+            rfTimer = setTimeout(() => {
+                rfInterval = setInterval(() => sendAction(team, 'legUpdate', val), 100);
+            }, 400);
+        }
+
+        function rfEnd() { clearTimeout(rfTimer); clearInterval(rfInterval); }
+
+        function showQR() {
+            document.getElementById('qr-overlay').classList.remove('hidden');
+            document.getElementById('qr-target').innerHTML = "";
+            new QRCode(document.getElementById("qr-target"), { text: window.location.href, width: 200, height: 200 });
+        }
+    </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'darts-v1';
+const CACHE_NAME = 'darts-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -12,9 +12,30 @@ self.addEventListener('install', (e) => {
   );
 });
 
+// Activate Event to clear old caches
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
+          }
+        })
+      );
+    })
+  );
+});
+
 // Fetch Event (Offline Capability)
 self.addEventListener('fetch', (e) => {
+  // Network-First Strategy
   e.respondWith(
-    caches.match(e.request).then((response) => response || fetch(e.request))
+    fetch(e.request).then((response) => {
+      return caches.open(CACHE_NAME).then((cache) => {
+        cache.put(e.request, response.clone());
+        return response;
+      });
+    }).catch(() => caches.match(e.request))
   );
 });

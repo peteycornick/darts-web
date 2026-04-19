@@ -86,7 +86,7 @@
                 <button onclick="document.getElementById('about-modal').classList.add('hidden')" class="modal-close-btn">✖</button>
                 <h2 style="margin-top:10px; color:var(--accent-home)">🎯 About Electro-Chalk</h2>
                 <p style="color:var(--text-main); font-size:16px; line-height:1.5; margin-bottom:20px;">
-                    A real-time, broadcast-style scoreboard and synchronized application designed for live darts leagues, tournaments, and venues.
+                    A modern take on the much-loved 7-segment digital scoreboards popular in classic pubs, now with the ability to share sessions and score together in real-time across multiple devices.
                 </p>
                 <div style="background:var(--color-surface-dark); padding:15px; border-radius:8px; margin-bottom:20px; text-align:left; font-size:14px; color:var(--text-muted);">
                     <p style="margin:0 0 10px 0;">
@@ -105,17 +105,13 @@
         <h1 style="font-size:3rem; margin-bottom:20px; text-align:center;">🎯 Electro-Chalk</h1>
         <p id="error-msg" style="color: var(--accent-away)"></p>
         <div class="flex-center" style="gap:20px; flex-wrap:wrap;">
-            <div class="panel text-center" style="width: 300px; min-height: 220px; display: flex; flex-direction: column; justify-content: space-between;">
-              <div>
-                  <h3 style="margin-top: 0; margin-bottom: 20px;">Start New Game</h3>
-              </div>
+            <div class="panel text-center" style="width: 300px; min-height: 220px; display: flex; flex-direction: column; justify-content: center; gap: 20px;">
+              <h3 style="margin: 0;">Start New Game</h3>
               <button class="btn-green" style="width: 100%; padding: 10px; font-size: 16px;" onclick="createGame()">Start</button>
             </div>
-            <div class="panel text-center" style="width: 300px; min-height: 220px; display: flex; flex-direction: column; justify-content: space-between;">
-              <div>
-                  <h3 style="margin-top: 0; margin-bottom: 20px;">Join Game</h3>
-                  <input type="number" id="join-code" placeholder="ID Code" style="width: 100%; margin-bottom: 10px;" />
-              </div>
+            <div class="panel text-center" style="width: 300px; min-height: 220px; display: flex; flex-direction: column; justify-content: center; gap: 20px;">
+              <h3 style="margin: 0;">Join Game</h3>
+              <input type="number" id="join-code" placeholder="ID Code" style="width: 80%; max-width: 220px; margin: 0 auto; display: block; text-align: center;" />
               <button class="btn-blue" style="width: 100%; padding: 10px; font-size: 16px;" onclick="joinGame()">Join</button>
             </div>
         </div>

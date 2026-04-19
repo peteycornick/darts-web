@@ -1,0 +1,98 @@
+:root {
+  /* Brand Colors */
+  --color-background: #000000;
+  --color-surface: #1e1e1e;
+  --color-surface-light: #222222;
+  --color-surface-dark: #111111;
+
+  /* Accent Colors */
+  --accent-home: #3b82f6;
+  --accent-away: #ef4444;
+  --accent-warn: #f59e0b;
+  --accent-success: #10b981;
+
+  /* Text Colors */
+  --text-main: #ffffff;
+  --text-muted: #aaaaaa;
+  --text-dark: #666666;
+
+  /* Typography & UI */
+  --font-family-base: 'Inter', system-ui, sans-serif;
+  --border-radius: 8px;
+  --border: #444444;
+  --bg-input: #333333;
+}
+
+/* --- SHARED UTILITIES --- */
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.relative {
+  position: relative;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* --- SHARED BUTTONS & PANELS --- */
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  padding: 20px;
+}
+
+.btn-green { background-color: var(--accent-success); color: white; border: none; border-radius: 4px; cursor: pointer; }
+.btn-blue { background-color: var(--accent-home); color: white; border: none; border-radius: 4px; cursor: pointer; }
+.btn-red { background-color: var(--accent-away); color: white; border: none; border-radius: 4px; cursor: pointer; }
+.btn-orange { background-color: var(--accent-warn); color: white; border: none; border-radius: 4px; cursor: pointer; }
+
+/* --- MODAL STYLES --- */
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.modal-content {
+  text-align: center;
+  position: relative;
+  max-width: 400px;
+  width: 100%;
+  background: var(--color-surface);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.btn-icon-top-right {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: #666;
+  font-size: 28px;
+  cursor: pointer;
+  transition: color 0.2s;
+}

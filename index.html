@@ -69,15 +69,54 @@
 </head>
 <body>
 
-    <div id="lobby">
-        <div class="logo">ELECTRO-<br><span class="text-green">CHALK</span></div>
-        <div id="lobby-qr"></div>
-        <button class="btn btn-green" onclick="createGame()">Start New Game</button>
-        <input type="number" id="join-code" class="code-input" placeholder="ID Code">
-        <button class="btn btn-outline" onclick="joinGame()">Join Game</button>
-        <p id="error-msg" class="text-red"></p>
+    <div id="lobby" class="app-container flex-center relative" style="flex: 1;">
         
-        <a href="https://peroco.net" class="peroco-link">← Return to Peroco Networks</a>
+        <button 
+            onclick="document.getElementById('about-modal').classList.remove('hidden')" 
+            class="btn-icon-top-right"
+            onmouseenter="this.style.color='var(--text-muted)'"
+            onmouseleave="this.style.color='var(--text-dark)'"
+            title="About Electro-Chalk"
+        >
+            ℹ️
+        </button>
+
+        <div id="about-modal" class="modal-overlay hidden">
+            <div class="panel modal-content">
+                <button onclick="document.getElementById('about-modal').classList.add('hidden')" class="modal-close-btn">✖</button>
+                <h2 style="margin-top:10px; color:var(--accent-home)">🎯 About Electro-Chalk</h2>
+                <p style="color:var(--text-main); font-size:16px; line-height:1.5; margin-bottom:20px;">
+                    A real-time, broadcast-style scoreboard and synchronized application designed for live darts leagues, tournaments, and venues.
+                </p>
+                <div style="background:var(--color-surface-dark); padding:15px; border-radius:8px; margin-bottom:20px; text-align:left; font-size:14px; color:var(--text-muted);">
+                    <p style="margin:0 0 10px 0;">
+                        <strong>💻 Open Source:</strong><br/> 
+                        Find the code and contribute on <a href="https://github.com/peteycornick/darts-web" target="_blank" rel="noreferrer" style="color:var(--accent-away)">GitHub</a>.
+                    </p>
+                    <p style="margin:0;">
+                        <strong>🌐 Hosted By:</strong><br/> 
+                        Peroco Networks at <a href="https://darts.peroco.net" target="_blank" rel="noreferrer" style="color:var(--accent-away)">darts.peroco.net</a>
+                    </p>
+                </div>
+                <button class="btn-blue" style="width:100%; padding:10px; border-radius: 4px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; color: white;" onclick="document.getElementById('about-modal').classList.add('hidden')">Close</button>
+            </div>
+        </div>
+
+        <h1 style="font-size:3rem; margin-bottom:20px; text-align:center;">🎯 Electro-Chalk</h1>
+        <p id="error-msg" style="color: var(--accent-away)"></p>
+        <div class="flex-center" style="gap:20px; flex-wrap:wrap;">
+            <div class="panel text-center">
+              <h3 style="margin-top: 0; margin-bottom: 20px;">Start New Game</h3>
+              <button class="btn-green" onclick="createGame()">Create Session</button>
+            </div>
+            <div class="panel text-center">
+              <h3 style="margin-top: 0; margin-bottom: 20px;">Join Game</h3>
+              <input type="number" id="join-code" placeholder="ID Code" /><br/><br/>
+              <button class="btn-blue" onclick="joinGame()">Join Session</button>
+            </div>
+        </div>
+
+        <button onclick="window.location.href = 'https://peroco.net'" style="background:transparent; color:var(--text-muted); border:1px solid var(--border); margin-top:30px; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:600; font-family:inherit;">Peroco Networks</button>
     </div>
 
     <div id="game-view" class="hidden">

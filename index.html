@@ -172,10 +172,6 @@
         let gameState = {};
         let rfTimer = null, rfInterval = null;
 
-        window.onload = function() {
-            new QRCode(document.getElementById("lobby-qr"), { text: window.location.href, width: 150, height: 150 });
-        }
-
         function createGame() { socket.emit('create'); }
         function joinGame() { 
             let id = document.getElementById('join-code').value;

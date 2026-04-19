@@ -105,14 +105,18 @@
         <h1 style="font-size:3rem; margin-bottom:20px; text-align:center;">🎯 Electro-Chalk</h1>
         <p id="error-msg" style="color: var(--accent-away)"></p>
         <div class="flex-center" style="gap:20px; flex-wrap:wrap;">
-            <div class="panel text-center">
-              <h3 style="margin-top: 0; margin-bottom: 20px;">Start New Game</h3>
-              <button class="btn-green" onclick="createGame()">Create Session</button>
+            <div class="panel text-center" style="width: 300px; min-height: 220px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                  <h3 style="margin-top: 0; margin-bottom: 20px;">Start New Game</h3>
+              </div>
+              <button class="btn-green" style="width: 100%; padding: 10px; font-size: 16px;" onclick="createGame()">Start</button>
             </div>
-            <div class="panel text-center">
-              <h3 style="margin-top: 0; margin-bottom: 20px;">Join Game</h3>
-              <input type="number" id="join-code" placeholder="ID Code" /><br/><br/>
-              <button class="btn-blue" onclick="joinGame()">Join Session</button>
+            <div class="panel text-center" style="width: 300px; min-height: 220px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                  <h3 style="margin-top: 0; margin-bottom: 20px;">Join Game</h3>
+                  <input type="number" id="join-code" placeholder="ID Code" style="width: 100%; margin-bottom: 10px;" />
+              </div>
+              <button class="btn-blue" style="width: 100%; padding: 10px; font-size: 16px;" onclick="joinGame()">Join</button>
             </div>
         </div>
 

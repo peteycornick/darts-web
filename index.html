@@ -124,16 +124,32 @@
     </div>
 
     <div id="game-view" class="hidden">
-        <div class="top-bar">
-            <button 
-                id="game-theme-toggle"
-                class="theme-toggle-btn"
-                title="Change Theme"
-            >💻</button>
-            <button class="back-btn" onclick="exitGame()">← EXIT</button>
-            <div class="info-group">
-                <span id="game-id-disp" onclick="showQR()">ID: 000000</span>
-                <span id="role-disp">GUEST</span>
+        <button onclick="document.getElementById('settings-modal').classList.remove('hidden')" style="position: absolute; top: 12px; right: 12px; background: var(--color-surface); border: 1px solid var(--border); border-radius: 8px; font-size: 20px; cursor: pointer; z-index: 50; padding: 6px 10px; color: var(--text-main); box-shadow: 0 4px 10px rgba(0,0,0,0.3);" onmouseover="this.style.filter='brightness(1.2)'" onmouseout="this.style.filter='none'" title="Settings">⚙️</button>
+
+        <div id="settings-modal" class="modal-overlay hidden" style="z-index: 1000;">
+            <div class="panel modal-content" style="max-width: 450px; text-align: left; padding: 25px;">
+                <button onclick="document.getElementById('settings-modal').classList.add('hidden')" class="modal-close-btn" style="top: 15px; right: 15px;">✖</button>
+                
+                <div class="settings-section-title">Session Info</div>
+                <div class="settings-group" style="text-align: center; padding: 20px; border-color: var(--accent-home); margin-bottom: 20px;">
+                    <div style="font-size:16px; color:var(--text-muted);">Logged in as: <strong id="settings-role" style="color:var(--text-main)">GUEST</strong></div>
+                    <div id="settings-id" style="font-size:3rem; letter-spacing:4px; font-weight:bold; color:var(--text-main); margin: 10px 0;">000000</div>
+                    <img id="settings-qr" src="" style="margin-bottom:20px; border-radius:8px; width:150px; height:150px; background:white; padding: 5px;" />
+                    <br/>
+                    <button class="btn-red" style="width:100%; padding:12px; font-size:16px;" onclick="exitGame()">Exit Session</button>
+                </div>
+
+                <div class="settings-section-title">Local Options & Appearance</div>
+                <div class="settings-group">
+                    <label class="settings-row">
+                        <span>Theme Preference</span>
+                        <select id="settings-theme-select" style="padding: 6px 10px; font-size: 14px; width: 120px; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px;">
+                            <option value="system">System</option>
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                        </select>
+                    </label>
+                </div>
             </div>
         </div>
 
@@ -200,11 +216,6 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div id="qr-overlay" class="hidden">
-        <div style="background:white; padding:15px; border-radius:15px;" id="qr-target"></div>
-        <button class="close-qr" onclick="document.getElementById('qr-overlay').classList.add('hidden')">Close</button>
     </div>
 
     <script>

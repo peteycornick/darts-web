@@ -1,26 +1,41 @@
-:root {
-  /* Brand Colors */
+:root, [data-theme="dark"] {
   --color-background: #000000;
   --color-surface: #1e1e1e;
   --color-surface-light: #222222;
   --color-surface-dark: #111111;
-
-  /* Accent Colors */
   --accent-home: #3b82f6;
   --accent-away: #ef4444;
   --accent-warn: #f59e0b;
   --accent-success: #10b981;
-
-  /* Text Colors */
   --text-main: #ffffff;
   --text-muted: #aaaaaa;
   --text-dark: #666666;
-
-  /* Typography & UI */
   --font-family-base: 'Inter', system-ui, sans-serif;
   --border-radius: 8px;
   --border: #444444;
   --bg-input: #333333;
+}
+
+[data-theme="light"] {
+  --color-background: #f3f4f6;
+  --color-surface: #ffffff;
+  --color-surface-light: #f9fafb;
+  --color-surface-dark: #e5e7eb;
+  
+  /* Tweaked accents for better contrast on white backgrounds */
+  --accent-home: #2563eb;
+  --accent-away: #dc2626;
+  --accent-warn: #d97706;
+  --accent-success: #059669;
+  
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --text-dark: #9ca3af;
+  
+  --font-family-base: 'Inter', system-ui, sans-serif;
+  --border-radius: 8px;
+  --border: #e5e7eb;
+  --bg-input: #f3f4f6;
 }
 
 /* --- SHARED UTILITIES --- */

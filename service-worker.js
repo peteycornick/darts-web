@@ -1,4 +1,4 @@
-const CACHE_NAME = 'chat-v1';
+const CACHE_NAME = 'darts-v10';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();

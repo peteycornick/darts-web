@@ -78,24 +78,6 @@
 
     <div id="lobby" class="app-container flex-center relative" style="flex: 1;">
         
-        <button 
-            id="lobby-theme-toggle"
-            class="theme-toggle-btn"
-            style="position: absolute; top: 20px; left: 20px;"
-            title="Change Theme"
-        >
-            💻
-        </button>
-        
-        <button 
-            onclick="document.getElementById('about-modal').classList.remove('hidden')" 
-            class="btn-icon-top-right"
-            onmouseenter="this.style.color='var(--text-muted)'"
-            onmouseleave="this.style.color='var(--text-dark)'"
-            title="About Electro-Chalk"
-        >
-            ℹ️
-        </button>
 
         <div id="about-modal" class="modal-overlay hidden">
             <div class="panel modal-content">
@@ -132,7 +114,13 @@
             </div>
         </div>
 
-        <button onclick="window.location.href = 'https://peroco.net'" style="background:transparent; color:var(--text-muted); border:1px solid var(--border); margin-top:30px; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:600; font-family:inherit;">Peroco Networks</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 620px; margin-top: 30px; padding: 0 20px;">
+            <button onclick="window.location.href = 'https://peroco.net'" style="background:transparent; color:var(--text-muted); border:1px solid var(--border); padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:600; font-family:inherit;">Peroco Networks</button>
+            <div style="display: flex; gap: 15px;">
+                <button id="lobby-theme-toggle" class="theme-toggle-btn" title="Change Theme" style="padding: 0;">💻</button>
+                <button onclick="document.getElementById('about-modal').classList.remove('hidden')" class="theme-toggle-btn" title="About Electro-Chalk" style="padding: 0;">ℹ️</button>
+            </div>
+        </div>
     </div>
 
     <div id="game-view" class="hidden">
@@ -234,7 +222,7 @@
         }
 
         const lobbyThemeBtn = document.getElementById('lobby-theme-toggle');
-        const gameThemeBtn = document.getElementById('game-theme-toggle');
+        const settingsThemeSelect = document.getElementById('settings-theme-select');
         let themePref = localStorage.getItem("theme_pref") || "system";
 
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -250,7 +238,7 @@
             const icon = themePref === 'dark' ? '🌙' : (themePref === 'light' ? '☀️' : '💻');
             const title = `Theme: ${themePref.charAt(0).toUpperCase() + themePref.slice(1)}`;
             if (lobbyThemeBtn) { lobbyThemeBtn.innerHTML = icon; lobbyThemeBtn.title = title; }
-            if (gameThemeBtn) { gameThemeBtn.innerHTML = icon; gameThemeBtn.title = title; }
+            if (settingsThemeSelect) { settingsThemeSelect.value = themePref; }
         }
 
         function cycleTheme() {
@@ -259,7 +247,9 @@
         }
 
         lobbyThemeBtn.addEventListener('click', cycleTheme);
-        gameThemeBtn.addEventListener('click', cycleTheme);
+        if (settingsThemeSelect) {
+            settingsThemeSelect.addEventListener('change', (e) => { themePref = e.target.value; applyTheme(); });
+        }
         mediaQuery.addEventListener('change', applyTheme);
         applyTheme(); // Initial load
 
@@ -282,8 +272,9 @@
             isHost = data.isHost;
             document.getElementById('lobby').classList.add('hidden');
             document.getElementById('game-view').classList.remove('hidden');
-            document.getElementById('game-id-disp').innerText = `ID: ${gameId}`;
-            document.getElementById('role-disp').innerText = isHost ? "HOST" : "GUEST";
+            document.getElementById('settings-id').innerText = gameId;
+            document.getElementById('settings-role').innerText = isHost ? "HOST" : "GUEST";
+            document.getElementById('settings-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.href.split('?')[0])}&margin=10`;
             if(!isHost) {
                 document.getElementById('kp-home').classList.add('hidden');
                 document.getElementById('kp-away').classList.add('hidden');
@@ -298,6 +289,7 @@
         });
 
         function exitGame() {
+            document.getElementById('settings-modal').classList.add('hidden');
             gameId = null;
             document.getElementById('game-view').classList.add('hidden');
             document.getElementById('lobby').classList.remove('hidden');
@@ -416,12 +408,6 @@
         }
 
         function rfEnd() { clearTimeout(rfTimer); clearInterval(rfInterval); }
-
-        function showQR() {
-            document.getElementById('qr-overlay').classList.remove('hidden');
-            document.getElementById('qr-target').innerHTML = "";
-            new QRCode(document.getElementById("qr-target"), { text: window.location.href, width: 200, height: 200 });
-        }
     </script>
 </body>
 </html>

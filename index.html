@@ -6,13 +6,19 @@
     <meta name="theme-color" content="#121212">
     <title>Electro-Chalk</title>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="theme.css">
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--color-background, #000000); color: var(--text-main, #ffffff); font-family: var(--font-family-base, sans-serif); margin: 0; padding: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; user-select: none; }
         .hidden { display: none !important; }
+
+        /* === MODERN SETTINGS UI === */
+        .settings-container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; width: 100%; }
+        .settings-section-title { font-size: 13px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; margin: 0 0 8px 12px; font-weight: 600; text-align: left; }
+        .settings-group { background: var(--color-surface); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
+        .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 15px; }
+        .settings-row:last-child { border-bottom: none; }
 
         #lobby { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; }
         .logo { font-size: 35px; font-weight: 900; text-align: center; margin-bottom: 10px; line-height: 1; }
@@ -24,10 +30,7 @@
         .peroco-link { margin-top: 20px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: bold; padding: 10px; transition: color 0.2s; }
         .peroco-link:active, .peroco-link:hover { color: var(--text-main); }
 
-        #game-view { display: flex; flex-direction: column; height: 100%; padding: 5px; padding-bottom: env(safe-area-inset-bottom); }
-        .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 5px; height: 40px; }
-        .back-btn { background: var(--bg-input); color: var(--text-muted); border: none; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; }
-        .info-group { display: flex; gap: 10px; font-size: 11px; color: var(--text-dark); font-family: monospace; }
+        #game-view { display: flex; flex-direction: column; height: 100%; padding: 5px; padding-bottom: env(safe-area-inset-bottom); position: relative; }
         
         .theme-toggle-btn {
             background: transparent; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; transition: color 0.2s; padding: 5px;
@@ -69,9 +72,6 @@
         .k-act { background: var(--accent-warn); color: white; }
         .k-nav { background: var(--border); color: var(--text-main); font-size: 14px; }
         .k-clr { background: var(--border); color: var(--accent-away); }
-
-        #qr-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .close-qr { margin-top: 20px; padding: 10px 20px; background: var(--bg-input); color: var(--text-main); border: none; border-radius: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -272,6 +272,12 @@
         let gameState = {};
         let rfTimer = null, rfInterval = null;
 
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            const joinCode = params.get('join');
+            if (joinCode) document.getElementById('join-code').value = joinCode;
+        };
+
         function createGame() { socket.emit('create'); }
         function joinGame() { 
             let id = document.getElementById('join-code').value;
@@ -285,7 +291,8 @@
             document.getElementById('game-view').classList.remove('hidden');
             document.getElementById('settings-id').innerText = gameId;
             document.getElementById('settings-role').innerText = isHost ? "HOST" : "GUEST";
-            document.getElementById('settings-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.href.split('?')[0])}&margin=10`;
+            const joinUrl = `${window.location.href.split('?')[0]}?join=${gameId}`;
+            document.getElementById('settings-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(joinUrl)}&margin=10`;
             if(!isHost) {
                 document.getElementById('kp-home').classList.add('hidden');
                 document.getElementById('kp-away').classList.add('hidden');

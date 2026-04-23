@@ -1,4 +1,4 @@
-const CACHE_NAME = 'darts-v5';
+const CACHE_NAME = 'darts-v8';
 const ASSETS = [
   './',
   './index.html',

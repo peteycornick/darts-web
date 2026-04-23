@@ -25,13 +25,20 @@
         .peroco-link:active, .peroco-link:hover { color: var(--text-main); }
 
         #game-view { display: flex; flex-direction: column; height: 100%; padding: 5px; padding-bottom: env(safe-area-inset-bottom); }
-        .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 5px; height: 35px; }
+        .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 5px; height: 40px; }
         .back-btn { background: var(--bg-input); color: var(--text-muted); border: none; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; }
         .info-group { display: flex; gap: 10px; font-size: 11px; color: var(--text-dark); font-family: monospace; }
         
+        .theme-toggle-btn {
+            background: transparent; border: none; color: var(--text-muted); font-size: 24px; cursor: pointer; transition: color 0.2s; padding: 5px;
+        }
+        .theme-toggle-btn:hover {
+            color: var(--text-main);
+        }
+        
         .dual-arena { display: flex; gap: 4px; flex: 1; min-height: 0; }
         .player-col { flex: 1; display: flex; flex-direction: column; background: var(--color-surface); border-radius: 12px; overflow: hidden; border: 2px solid transparent; }
-        .player-col.home { border-color: color-mix(in srgb, var(--accent-success) 20%, transparent); }
+        .player-col.home { border-color: color-mix(in srgb, var(--accent-home) 20%, transparent); }
         .player-col.away { border-color: color-mix(in srgb, var(--accent-away) 20%, transparent); }
 
         .p-header { padding: 8px 5px 0; display: flex; flex-direction: column; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); padding-bottom: 8px; }
@@ -40,13 +47,13 @@
         .leg-box { display: flex; align-items: center; justify-content: center; gap: 15px; background: rgba(255,255,255,0.05); border-radius: 50px; padding: 4px 10px; border: 1px solid var(--border); }
         .leg-val { font-size: 22px; font-weight: 900; min-width: 30px; text-align: center; font-variant-numeric: tabular-nums; color: white; }
         .leg-btn { width: 35px; height: 35px; border-radius: 50%; border: none; font-size: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-        .home .leg-btn { background: var(--accent-success); color: white; }
+        .home .leg-btn { background: var(--accent-home); color: white; }
         .away .leg-btn { background: var(--accent-away); color: white; }
         .leg-btn:active { transform: scale(0.9); opacity: 0.8; }
 
         .p-score { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 18vw; font-weight: 900; line-height: 1; position: relative; }
-        .text-green { color: var(--accent-success); }
-        .text-red { color: var(--accent-away); }
+        .text-home { color: var(--accent-home); }
+        .text-away { color: var(--accent-away); }
         .setup-mode { color: #555; font-size: 12vw; }
         .win-indicator { color: var(--accent-warn); text-shadow: 0 0 10px rgba(245, 158, 11, 0.5); }
         .undo-btn { background: var(--accent-warn); color: white; border: none; padding: 15px 30px; font-size: 20px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
@@ -70,6 +77,15 @@
 <body>
 
     <div id="lobby" class="app-container flex-center relative" style="flex: 1;">
+        
+        <button 
+            id="lobby-theme-toggle"
+            class="theme-toggle-btn"
+            style="position: absolute; top: 20px; left: 20px;"
+            title="Change Theme"
+        >
+            💻
+        </button>
         
         <button 
             onclick="document.getElementById('about-modal').classList.remove('hidden')" 
@@ -121,6 +137,11 @@
 
     <div id="game-view" class="hidden">
         <div class="top-bar">
+            <button 
+                id="game-theme-toggle"
+                class="theme-toggle-btn"
+                title="Change Theme"
+            >💻</button>
             <button class="back-btn" onclick="exitGame()">← EXIT</button>
             <div class="info-group">
                 <span id="game-id-disp" onclick="showQR()">ID: 000000</span>
@@ -202,6 +223,36 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js');
         }
+
+        const lobbyThemeBtn = document.getElementById('lobby-theme-toggle');
+        const gameThemeBtn = document.getElementById('game-theme-toggle');
+        let themePref = localStorage.getItem("theme_pref") || "system";
+
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+        function applyTheme() {
+            let activeTheme = themePref;
+            if (themePref === 'system') {
+                activeTheme = mediaQuery.matches ? 'dark' : 'light';
+            }
+            document.documentElement.setAttribute('data-theme', activeTheme);
+            localStorage.setItem("theme_pref", themePref);
+            
+            const icon = themePref === 'dark' ? '🌙' : (themePref === 'light' ? '☀️' : '💻');
+            const title = `Theme: ${themePref.charAt(0).toUpperCase() + themePref.slice(1)}`;
+            if (lobbyThemeBtn) { lobbyThemeBtn.innerHTML = icon; lobbyThemeBtn.title = title; }
+            if (gameThemeBtn) { gameThemeBtn.innerHTML = icon; gameThemeBtn.title = title; }
+        }
+
+        function cycleTheme() {
+            themePref = themePref === 'dark' ? 'light' : (themePref === 'light' ? 'system' : 'dark');
+            applyTheme();
+        }
+
+        lobbyThemeBtn.addEventListener('click', cycleTheme);
+        gameThemeBtn.addEventListener('click', cycleTheme);
+        mediaQuery.addEventListener('change', applyTheme);
+        applyTheme(); // Initial load
 
         const socket = io();
         let gameId = null;

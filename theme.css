@@ -80,7 +80,7 @@
   right: 10px;
   background: transparent;
   border: none;
-  color: white;
+  color: var(--text-main);
   font-size: 24px;
   cursor: pointer;
 }

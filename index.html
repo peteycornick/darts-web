@@ -45,7 +45,7 @@
         .p-name { font-size: 24px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; letter-spacing: 1px; }
         
         .leg-box { display: flex; align-items: center; justify-content: center; gap: 15px; background: rgba(255,255,255,0.05); border-radius: 50px; padding: 4px 10px; border: 1px solid var(--border); }
-        .leg-val { font-size: 22px; font-weight: 900; min-width: 30px; text-align: center; font-variant-numeric: tabular-nums; color: white; }
+        .leg-val { font-size: 22px; font-weight: 900; min-width: 30px; text-align: center; font-variant-numeric: tabular-nums; color: var(--text-main); }
         .leg-btn { width: 35px; height: 35px; border-radius: 50%; border: none; font-size: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         .home .leg-btn { background: var(--accent-home); color: white; }
         .away .leg-btn { background: var(--accent-away); color: white; }
@@ -61,7 +61,7 @@
         .p-hist { display: flex; gap: 2px; height: 30px; justify-content: center; padding: 0 5px; margin-bottom: 5px; }
         .dot { flex: 1; background: var(--bg-input); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--text-muted); font-weight: bold; border: 1px solid transparent; }
         .dot.sel { border-color: var(--accent-warn); color: var(--accent-warn); background: rgba(245, 158, 11, 0.1); }
-        .p-input { height: 30px; text-align: center; font-size: 24px; font-weight: bold; font-family: monospace; color: white; background: rgba(0,0,0,0.2); margin-bottom: 5px; }
+        .p-input { height: 30px; text-align: center; font-size: 24px; font-weight: bold; font-family: monospace; color: var(--text-main); background: rgba(0,0,0,0.2); margin-bottom: 5px; }
 
         .kp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; padding: 5px; background: rgba(0,0,0,0.3); height: 45%; }
         .k-btn { border: none; border-radius: 6px; font-size: 18px; font-weight: 700; background: var(--color-surface-light); color: var(--text-main); padding: 0; display: flex; align-items: center; justify-content: center; }
@@ -221,7 +221,16 @@
 
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('service-worker.js');
+            navigator.serviceWorker.register('service-worker.js').then(reg => {
+                reg.update(); // Manually check for an updated service worker on every page load
+            });
+
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (refreshing) return;
+                refreshing = true;
+                window.location.reload();
+            });
         }
 
         const lobbyThemeBtn = document.getElementById('lobby-theme-toggle');
